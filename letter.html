@@ -185,10 +185,78 @@
             }
         }
 
-        .music-toggle {
+        /* Music control cluster: toggle button + expandable volume slider */
+        .music-control {
             position: fixed;
             bottom: 22px;
             right: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .volume-wrap {
+            display: flex;
+            align-items: center;
+            background: #fff8fb;
+            border: 2px solid #f3b5ca;
+            border-radius: 30px;
+            padding: 8px 16px 8px 14px;
+            box-shadow: 0 8px 20px rgba(190, 92, 125, 0.2);
+            max-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-width 0.35s ease, opacity 0.25s ease, padding 0.35s ease;
+            pointer-events: none;
+        }
+
+        .music-control.show-volume .volume-wrap {
+            max-width: 160px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .volume-icon {
+            font-size: 14px;
+            color: #d65d88;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        #volumeSlider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 110px;
+            height: 4px;
+            border-radius: 4px;
+            background: #f5c2d5;
+            outline: none;
+            cursor: pointer;
+        }
+
+        #volumeSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #d65d88;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(190, 92, 125, 0.4);
+        }
+
+        #volumeSlider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #d65d88;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(190, 92, 125, 0.4);
+        }
+
+        .music-toggle {
             width: 52px;
             height: 52px;
             border-radius: 50%;
@@ -201,7 +269,7 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(190, 92, 125, 0.35);
-            z-index: 10;
+            flex-shrink: 0;
         }
 
         .music-toggle:hover {
@@ -241,7 +309,14 @@
         <div class="heart-layer" id="heartLayer"></div>
 
     <audio id="bgMusic" src="song.mp3" loop preload="auto"></audio>
-    <button class="music-toggle" id="musicToggle" aria-label="Toggle music">♪</button>
+
+    <div class="music-control" id="musicControl">
+        <div class="volume-wrap">
+            <span class="volume-icon">♪</span>
+            <input type="range" id="volumeSlider" min="0" max="100" value="15" aria-label="Music volume">
+        </div>
+        <button class="music-toggle" id="musicToggle" aria-label="Toggle music">♪</button>
+    </div>
 
     <div class="container">
 
@@ -579,7 +654,14 @@
 
         const music = document.getElementById("bgMusic");
         const musicToggle = document.getElementById("musicToggle");
+        const musicControl = document.getElementById("musicControl");
+        const volumeSlider = document.getElementById("volumeSlider");
         let musicStarted = false;
+
+        
+        const DEFAULT_VOLUME = 15;
+        volumeSlider.value = DEFAULT_VOLUME;
+        music.volume = DEFAULT_VOLUME / 100;
 
         function startMusic() {
             if (musicStarted) return;
@@ -613,6 +695,19 @@
             } else {
                 music.pause();
                 musicToggle.textContent = "✕";
+            }
+        
+            musicControl.classList.toggle("show-volume");
+        });
+
+        volumeSlider.addEventListener("input", () => {
+            music.volume = volumeSlider.value / 100;
+        });
+
+        // Hide the slider if the user taps/clicks elsewhere
+        document.addEventListener("click", (e) => {
+            if (!musicControl.contains(e.target)) {
+                musicControl.classList.remove("show-volume");
             }
         });
     </script>
