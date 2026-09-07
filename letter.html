@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Special Places ♡</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #ffe6f0;
+            color: #6b3b4d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: #fff8fb;
+            border: 2px solid #f5c2d5;
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 15px 40px rgba(190, 92, 125, 0.15);
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #d65d88;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #a66a7d;
+            font-size: 14px;
+        }
+
+        .place {
+            margin-bottom: 35px;
+            opacity: 0;
+            transform: translateY(60px);
+            will-change: transform, opacity;
+        }
+
+        /* Bounce-in animation, triggered by adding .in-view via IntersectionObserver */
+        .place.in-view {
+            animation: bounceUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes bounceUp {
+            0% {
+                opacity: 0;
+                transform: translateY(80px);
+            }
+            45% {
+                opacity: 1;
+                transform: translateY(-18px);
+            }
+            65% {
+                transform: translateY(10px);
+            }
+            80% {
+                transform: translateY(-6px);
+            }
+            92% {
+                transform: translateY(2px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 25px;
+        }
+
+        .map {
+            height: 500px;
+            background: #f8d9e5;
+            border: 4px solid #f3b5ca;
+            border-radius: 22px;
+            overflow: hidden;
+        }
+
+        .map iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .note {
+            min-height: 500px;
+            background: #fff0f5;
+            border: 3px solid #f3b5ca;
+            border-radius: 22px;
+            padding: 25px;
+            color: #6b3b4d;
+            font-size: 15px;
+            line-height: 1.7;
+            user-select: none;
+        }
+
+        .note h2 {
+            color: #d65d88;
+            margin-bottom: 12px;
+        }
+
+        .note p {
+            margin-bottom: 15px;
+        }
+
+        .divider {
+            width: 80%;
+            height: 2px;
+            background: #f3b5ca;
+            margin: 35px auto;
+            border-radius: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #c4879b;
+            font-size: 13px;
+            user-select: none;
+        }
+
+        /* Fixed full-screen layer so hearts drift across the whole background,
+           behind the card but visible everywhere else on the page */
+        .heart-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .floating-heart {
+            position: absolute;
+            bottom: -60px;
+            opacity: 0;
+            user-select: none;
+            animation: floatUp linear infinite;
+            will-change: transform, opacity;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: var(--heart-opacity, 0.5);
+            }
+            50% {
+                transform: translateY(-55vh) translateX(var(--drift, 20px)) rotate(15deg);
+            }
+            85% {
+                opacity: var(--heart-opacity, 0.5);
+            }
+            100% {
+                transform: translateY(-115vh) translateX(calc(var(--drift, 20px) * -1)) rotate(-15deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 800px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .map {
+                height: 350px;
+            }
+
+            .note {
+                min-height: 350px;
+            }
+
+            .header h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+        <div class="heart-layer" id="heartLayer"></div>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>♡ Our special places ♡</h1>
+            <p>A little place to keep locations and some memories.</p>
+        </div>
+
+        <div class="place">
+            <div class="content">
+
+                <div class="map">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4782.89267513192!2d121.05410657589593!3d14.511917979240128!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cff126f85eff%3A0x23fbc3e5a4a83bd0!2sSevi%20Coffee!5e1!3m2!1sen!2sph!4v1788756860604!5m2!1sen!2sph"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+                </div>
+
+                <div class="note">
+                    <h2>♡ your birthday and our first date!</h2>
+
+                    <p>
+                        this is where we had our first meeting, our first date.
+                    </p>
+
+                    <p>
+                        heart because this was also the first time we ever hugged each other. and the fact that it was your birthday too!! somehow makes this place even more special to me.
+                    </p>
+
+                    <p>
+                        i don't know if it means as much to you as it does to me, but i really hope it does, because this is one of those memories i'll always look back on and smile at.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="place">
+            <div class="content">
+
+                <div class="map">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d422.7512541164499!2d121.05694669163859!3d14.512298332597272!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cf002bdc8e97%3A0x90feaf262f168676!2sCafe%20Prince%20-%20Central%20Signal!5e1!3m2!1sen!2sph!4v1788757570595!5m2!1sen!2sph"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+                </div>
+
+                <div class="note">
+                    <h2>♡ Cafe prince!</h2>
+
+                    <p>
+                        this was the first time that we went on a date where i used my brother's ebike and was still kinda bad at it. to be honest i wanna act tough and be the one to hatid you pauwi but thinking about your safety, i decided not to. i didnt wanna risk anything happening to you just because i wanted to act cool HAHAHA
+                    </p>
+
+                    <p>
+                        was also the time where we watched alice in borderland on the right side of the cafe. i really love that moment. it was such a simple moment but for some reason it stayed with me.
+                    </p>
+
+                    <p>
+                        i dont think i'll ever forget it
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="place">
+            <div class="content">
+
+                <div class="map">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d298.9324147465621!2d121.05729177087903!3d14.510716441821595!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cfe682ede393%3A0x513f262d1d613e38!2sLucky%20Cat%20Mandarin%20Caf%C3%A9!5e1!3m2!1sen!2sph!4v1788757954532!5m2!1sen!2sph"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+                </div>
+
+                <div class="note">
+                    <h2>♡ THE BEST PLACE WE'VE BEEN ON</h2>
+
+                    <p>
+                        CASSY!! cassy's the best part of this cafe tbh. the matcha frappe was second. this is also the 2nd best place that we've been on.
+                    </p>
+
+                    <p>
+                        tho i may not always have the money for the drinks and food, we had the best memories there with our baby cassy.
+                    </p>
+
+                    <p>
+                        this was also where we kissed. super happy ako nun. i really love that moment and i'll always remember it.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="place">
+            <div class="content">
+
+                <div class="map">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1691.0438575708315!2d121.04471745550151!3d14.50721321137133!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cfc126a7a2f9%3A0xa096cfe45e9e7ff2!2sArca%20Grounds!5e1!3m2!1sen!2sph!4v1788758508729!5m2!1sen!2sph"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+                </div>
+
+                <div class="note">
+                    <h2>♡ The legendary arca ground</h2>
+
+                    <p>
+                        honestly, its crazy how we went from just meeting at the cafe and talking to laying down in the grass and cuddling. this is number one on my most cherished places forever.
+                    </p>
+
+                    <p>
+                        this was the time when we slowly started making progress with our relationship. we talked, we cuddled and yk some other stuff.
+                    </p>
+
+                    <p>
+                        this was also where we kissed. super happy ako nun. i really love that moment and i'll always remember it.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="place">
+            <div class="content">
+
+                <div class="map">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d298.9342094328216!2d121.04861558602882!3d14.509387320613582!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sph!4v1788759000971!5m2!1sen!2sph"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+                </div>
+
+                <div class="note">
+                    <h2>♡ this random spot between two buildings</h2>
+
+                    <p>
+                        FREAKING LOVE THIS SPOT. after the arca ground closed, we started looking for other spots to hangout at, then we came across this place after buying matcha at lawsons.
+                    </p>
+
+                    <p>
+                        this one is also really special to me. this was the first time i bought you takoyaki. tbh i already lost count on how many times i've told this story to my friends.
+                    </p>
+
+                    <p>
+                        its insane how cute u were when u were eating it. the smile, the body language and everything else. to be honest, it was also the time where i really felt seen and appreciated by you. super cute ng baby ko. i love you so much!
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="place">
+            <div class="content">
+
+                <div class="map">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1422.0029931413553!2d121.0449972053354!3d14.505613069372766!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cf6b67373151%3A0x5e64114e19939365!2sAyala%20Malls%20Arca%20South!5e1!3m2!1sen!2sph!4v1788759395000!5m2!1sen!2sph"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+                </div>
+
+                <div class="note">
+                    <h2>♡ Arca mall</h2>
+
+                    <p>
+                        the first time we went here was valentines day and holy hell, it was so chaotic. we went there and it was raining cats and dogs. it was so hard after we finally found a parking spot and we were wet as fuck. but nonetheless, it was also such a sweet day.
+                    </p>
+
+                    <p>
+                        it was our first time celebrating valentines together and it was also really nice just strolling around the mall with you next to me.
+                    </p>
+
+                    <p>
+                        tho, the potato corner sucked since they didnt take cashless. still, super fun pa rin and its definitely one of those days that i'll always remember.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="place note">
+            <p>
+                to be honest, i dont wanna add landers on this. its the place where yk, we had a bad time together. im really sorry for what happened.
+            </p>
+
+            <p>
+                it was really stupid of me and i shouldve handled the situation way better. i know i cant change what happened anymore, and well, whats done is done. im already suffering from the mistakes that i made and i just wish i handled things differently.
+            </p>
+
+            <p>
+                but despite everything, i still love you and i will continue to do so for eternity. i love you so much, jyra!
+            </p>
+            <p>your very own kinger, david</p>
+        </div>
+
+        <div class="footer">
+            one last chance perhaps?
+        </div>
+
+    </div>
+
+    <script>
+        const HEART_COLORS = ["#e89ab7", "#d65d88", "#f3b5ca", "#c4879b", "#ffb6c9"];
+        const layer = document.getElementById("heartLayer");
+
+        function createHeart() {
+            const heart = document.createElement("div");
+            heart.classList.add("floating-heart");
+            heart.innerHTML = Math.random() > 0.5 ? "♡" : "♥";
+
+            const size = 12 + Math.random() * 22;
+            const duration = 7 + Math.random() * 8;
+            const drift = (Math.random() * 80 - 40) + "px";
+
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.fontSize = size + "px";
+            heart.style.color = HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)];
+            heart.style.setProperty("--drift", drift);
+            heart.style.setProperty("--heart-opacity", 0.35 + Math.random() * 0.35);
+            heart.style.animationDuration = duration + "s";
+
+            layer.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, duration * 1000);
+        }
+
+        for (let i = 0; i < 15; i++) {
+            setTimeout(createHeart, i * 200);
+        }
+
+        setInterval(createHeart, 450);
+
+        const places = document.querySelectorAll(".place");
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.remove("in-view");
+                        void entry.target.offsetWidth;
+                        entry.target.classList.add("in-view");
+                    } else {
+                        entry.target.classList.remove("in-view");
+                    }
+                });
+            },
+            {
+                threshold: 0.2,
+                rootMargin: "0px 0px -50px 0px"
+            }
+        );
+
+        places.forEach((place) => observer.observe(place));
+    </script>
+
+</body>
+</html>
