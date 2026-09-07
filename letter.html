@@ -60,7 +60,6 @@
             will-change: transform, opacity;
         }
 
-        
         .place.in-view {
             animation: bounceUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
@@ -186,6 +185,29 @@
             }
         }
 
+        .music-toggle {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #d65d88;
+            color: #fff;
+            border: none;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(190, 92, 125, 0.35);
+            z-index: 10;
+        }
+
+        .music-toggle:hover {
+            background: #c14874;
+        }
+
         @media (max-width: 800px) {
             body {
                 padding: 15px;
@@ -218,6 +240,9 @@
 
         <div class="heart-layer" id="heartLayer"></div>
 
+    <audio id="bgMusic" src="song.mp3" loop preload="auto"></audio>
+    <button class="music-toggle" id="musicToggle" aria-label="Toggle music">♪</button>
+
     <div class="container">
 
         <div class="header">
@@ -238,14 +263,14 @@
                 </div>
 
                 <div class="note">
-                    <h2>♡ your birthday and our first date!</h2>
+                    <h2>♡ sevi coffee</h2>
 
                     <p>
-                        this is where we had our first meeting, our first date.
+                        your birthday and our first date!
                     </p>
 
                     <p>
-                        this was special because this was also the first time we ever hugged each other. and the fact that it was your birthday too!! somehow makes this place even more special to me.
+                        this place will always hold a special place in my heart because this was also the first time we ever hugged each other. and the fact that it was your birthday too!! somehow makes this place even more special to me.
                     </p>
 
                     <p>
@@ -279,10 +304,6 @@
 
                     <p>
                         was also the time where we watched alice in borderland on the right side of the cafe. i really love that moment. it was such a simple moment but for some reason it stayed with me.
-                    </p>
-
-                    <p>
-                        i dont think i'll ever forget it
                     </p>
                 </div>
 
@@ -348,7 +369,7 @@
                     </p>
 
                     <p>
-                        this was also where we kissed. super happy ako nun. i really love that moment. 
+                        its super special to me because this is where i felt like we started getting more and more attached to each other. to be honest, i still think about it to this day.
                     </p>
                 </div>
 
@@ -498,6 +519,45 @@
         );
 
         places.forEach((place) => observer.observe(place));
+
+        const music = document.getElementById("bgMusic");
+        const musicToggle = document.getElementById("musicToggle");
+        let musicStarted = false;
+
+        function startMusic() {
+            if (musicStarted) return;
+            music.play().then(() => {
+                musicStarted = true;
+                musicToggle.textContent = "♪";
+            }).catch(() => {
+                musicStarted = false;
+            });
+        }
+
+        startMusic();
+
+        function unlockAutoplay() {
+            startMusic();
+            window.removeEventListener("click", unlockAutoplay);
+            window.removeEventListener("touchstart", unlockAutoplay);
+            window.removeEventListener("keydown", unlockAutoplay);
+            window.removeEventListener("scroll", unlockAutoplay);
+        }
+
+        window.addEventListener("click", unlockAutoplay);
+        window.addEventListener("touchstart", unlockAutoplay);
+        window.addEventListener("keydown", unlockAutoplay);
+        window.addEventListener("scroll", unlockAutoplay);
+
+        musicToggle.addEventListener("click", () => {
+            if (music.paused) {
+                music.play();
+                musicToggle.textContent = "♪";
+            } else {
+                music.pause();
+                musicToggle.textContent = "✕";
+            }
+        });
     </script>
 
 </body>
